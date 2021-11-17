@@ -2,7 +2,12 @@
   <div id="app">
     <header>
       <img alt="Vue logo" src="./assets/logo.png" />
-      <form @submit.prevent="apiSearch">
+      <form
+        @submit.prevent="
+          apiSearch(moviesPath, 'it', 'movies');
+          apiSearch(seriesPath, 'it', 'series');
+        "
+      >
         <input type="text" v-model="searchInput" />
         <button>Search</button>
       </form>
@@ -13,6 +18,14 @@
           {{ movie.title }} ({{ movie.original_title }})
           {{ getFlagFromCountry(movie.original_language) }}
           {{ movie.vote_average }}
+        </li>
+      </ul>
+      <hr />
+      <ul>
+        <li v-for="(serie, i) in series" :key="i">
+          {{ serie.name }} ({{ serie.original_name }})
+          {{ getFlagFromCountry(serie.original_language) }}
+          {{ serie.vote_average }}
         </li>
       </ul>
     </main>
@@ -31,28 +44,32 @@ export default {
     return {
       apiUrl: "https://api.themoviedb.org/3",
       apiKey: "9050243653544e50d5a8b17836489f93",
+      moviesPath: "/search/movie",
       movies: [],
+      seriesPath: "/search/tv",
+      series: [],
       searchInput: "ciao",
     };
   },
   methods: {
-    apiSearch() {
+    apiSearch(path, lang, dataKey) {
       axios
-        .get(this.apiUrl + "/search/movie", {
+        .get(this.apiUrl + path, {
           params: {
             api_key: this.apiKey,
-            language: "it",
+            language: lang,
             query: this.searchInput,
           },
         })
         .then((resp) => {
-          this.movies = [];
-          this.movies.push(...resp.data.results);
+          this[dataKey] = [];
+          this[dataKey].push(...resp.data.results);
         });
     },
     getCountryfromLanguage(lang) {
       if (lang === "en") return "GB";
       if (lang === "es") return "ES";
+      if (lang === "el") return "GR";
 
       let CountryLanguage = require("country-language");
       let countryCode = CountryLanguage.getLanguage(
