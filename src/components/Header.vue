@@ -1,7 +1,8 @@
 <template>
-  <header>
-    <img alt="Boolflix logo" src="@/assets/logo.png" />
+  <header class="header">
+    <a href="#" class="header__brand">BOOLFLIX</a>
     <input
+      class="header__search-input"
       type="text"
       :value="inputValue"
       @keyup.enter="$emit('input', $event.target.value)"
@@ -28,4 +29,25 @@ export default {
 };
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.header {
+  background-color: black;
+  display: flex;
+  align-items: center;
+  padding: 1rem 2rem;
+  .header__brand {
+    color: red;
+    margin-right: auto;
+    text-decoration: none;
+    font-size: 2rem;
+  }
+  .header__search-input {
+    height: 2rem;
+    width: 40ch;
+    padding: 0 1rem;
+    &:focus {
+      outline: 1px solid red;
+    }
+  }
+}
+</style>

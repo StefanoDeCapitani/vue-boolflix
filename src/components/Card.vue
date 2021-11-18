@@ -1,25 +1,31 @@
 <template>
-  <div>
+  <div class="card">
     <img :src="posterPath" alt="" />
-    {{ title }} ({{ originalTitle }})
-    {{ languageFlag }}
-    <font-awesome-icon
-      v-for="(star, i) in getStarsArray(card.vote_average)"
-      :key="i"
-      :icon="star"
-    />
+    <div class="card__info">
+      <p><span class="key">Titolo: </span>{{ title }}</p>
+      <p v-if="originalTitle">
+        <span class="key">Titolo originale: </span> {{ originalTitle }}
+      </p>
+      <p>
+        <span class="key">Lingua: </span><LanguageFlag :language="language" />
+      </p>
+      <p>
+        <span class="key">Voto: </span
+        ><FiveStarsRating :voteAverage="voteAverage" />
+      </p>
+    </div>
   </div>
 </template>
 
 <script>
-import { hasFlag } from "country-flag-icons";
-import getUnicodeFlagIcon from "country-flag-icons/unicode";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import FiveStarsRating from "./FiveStarRating.vue";
+import LanguageFlag from "./LanguageFlag.vue";
 
 export default {
   name: "Card",
   components: {
-    FontAwesomeIcon,
+    FiveStarsRating,
+    LanguageFlag,
   },
   props: {
     posterPath: String,
@@ -28,50 +34,39 @@ export default {
     language: String,
     voteAverage: Number,
   },
-  data() {
-    return {
-      languageFlag: this.getFlagFromCountry(this.language),
-    };
-  },
-  methods: {
-    getCountryfromLanguage(lang) {
-      if (lang === "en") return "GB";
-      if (lang === "es") return "ES";
-      if (lang === "el") return "GR";
-
-      let CountryLanguage = require("country-language");
-      let countryCode = CountryLanguage.getLanguage(
-        lang,
-        function (err, language) {
-          if (err) {
-            console.log(err);
-          } else {
-            return language.countries
-              .map((country) => country.code_2)
-              .filter(
-                (country) =>
-                  country === lang.toUpperCase() ||
-                  country.startsWith(lang.slice(0, 1).toUpperCase())
-              )[0];
-          }
-        }
-      );
-      return countryCode;
-    },
-    getFlagFromCountry(lang) {
-      let country = this.getCountryfromLanguage(lang);
-      return hasFlag(country) ? getUnicodeFlagIcon(country) : "";
-    },
-    getStarsArray(vote_average) {
-      let stars = Math.ceil(vote_average / 2);
-      let iconsArray = [];
-      for (let i = 0; i < 5; i++) {
-        iconsArray.push(i < stars ? ["fas", "star"] : ["far", "star"]);
-      }
-      return iconsArray;
-    },
-  },
 };
 </script>
 
-<style lang="sass" scoped></style>
+<style lang="scss" scoped>
+.card {
+  position: relative;
+  cursor: pointer;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .card__info {
+    position: absolute;
+    inset: 0;
+    padding: 1.5rem 2rem;
+    background-color: black;
+    color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    line-height: 1.5rem;
+    .key {
+      font-weight: bold;
+    }
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  &:hover {
+    .card__info {
+      opacity: 1;
+    }
+  }
+}
+</style>

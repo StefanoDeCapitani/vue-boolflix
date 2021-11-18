@@ -1,14 +1,17 @@
 <template>
-  <main>
+  <main class="main">
     <CardsContainer
       :searchInput="search"
       searchCategory="movies"
       searchLanguage="it"
+      title="Film"
     />
+    <hr />
     <CardsContainer
       :searchInput="search"
       searchCategory="series"
       searchLanguage="it"
+      title="Serie TV"
     />
   </main>
 </template>
@@ -35,4 +38,11 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgb(100, 100, 100);
+}
+</style>

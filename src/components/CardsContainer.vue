@@ -1,14 +1,17 @@
 <template>
   <div class="container">
-    <Card
-      v-for="card in customCards"
-      :key="card.id"
-      :posterPath="card.poster_path"
-      :title="card.title"
-      :originalTitle="card.original_title"
-      :language="card.original_language"
-      :voteAverage="card.vote_average"
-    />
+    <h2 class="title">{{ title }}</h2>
+    <div class="cardsGrid">
+      <Card
+        v-for="card in customCards"
+        :key="card.id"
+        :posterPath="card.poster_path"
+        :title="card.title"
+        :originalTitle="card.original_title"
+        :language="card.original_language"
+        :voteAverage="card.vote_average"
+      ></Card>
+    </div>
   </div>
 </template>
 
@@ -22,15 +25,10 @@ export default {
     Card,
   },
   props: {
+    title: String,
     searchInput: String,
     searchCategory: String,
     searchLanguage: String,
-  },
-  watch: {
-    searchInput: function () {
-      this.search = this.searchInput;
-      this.apiSearch();
-    },
   },
   data() {
     return {
@@ -41,10 +39,15 @@ export default {
       cards: [],
     };
   },
+  watch: {
+    searchInput: function () {
+      this.search = this.searchInput;
+      this.apiSearch();
+    },
+  },
   computed: {
     customCards: function () {
       return this.cards.map((card) => {
-        console.log("hei");
         return {
           id: card.id,
           title: card.title || card.name,
@@ -60,7 +63,9 @@ export default {
     getOriginalTitleIfDifferentFromTitle(card) {
       let title = card.title || card.name;
       let originalTitle = card.original_title || card.original_name;
-      return title === originalTitle ? "" : originalTitle;
+      return title.toLowerCase() === originalTitle.toLowerCase()
+        ? ""
+        : originalTitle;
     },
     getPosterCompletePath(width, path) {
       if (!path) {
@@ -78,7 +83,6 @@ export default {
           },
         })
         .then((resp) => {
-          console.log(resp);
           this.cards = [];
           this.cards.push(...resp.data.results);
         });
@@ -87,4 +91,24 @@ export default {
 };
 </script>
 
-<style lang="sss" scoped></style>
+<style lang="scss" scoped>
+.container {
+  max-width: 1280px;
+  padding: 3rem 0;
+  .title {
+    font-size: 2.5rem;
+    margin: 0 1rem 1rem;
+  }
+  .cardsGrid {
+    $gap: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -$gap;
+    margin-right: -$gap;
+    .card {
+      width: calc(100% / 5 - $gap * 2);
+      margin: $gap;
+    }
+  }
+}
+</style>
