@@ -9,6 +9,11 @@
     "build_push": "npm run build && git add . && git commit -n -m 'Created/Updated build' && git push"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.4",
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-regular-svg-icons": "^5.15.4",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/vue-fontawesome": "^2.0.6",
     "axios": "^0.24.0",
     "core-js": "^3.6.5",
     "country-flag-icons": "^1.4.14",

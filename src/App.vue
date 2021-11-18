@@ -14,18 +14,28 @@
     </header>
     <main>
       <ul>
-        <li v-for="(movie, i) in movies" :key="i">
+        <li v-for="movie in movies" :key="movie.id">
           {{ movie.title }} ({{ movie.original_title }})
           {{ getFlagFromCountry(movie.original_language) }}
-          {{ movie.vote_average }}
+          <font-awesome-icon
+            v-for="(star, i) in getStarsArray(movie.vote_average)"
+            :key="i"
+            :icon="star"
+          />
+          <img :src="getPosterCompletePath('w342', movie.poster_path)" alt="" />
         </li>
       </ul>
       <hr />
       <ul>
-        <li v-for="(serie, i) in series" :key="i">
+        <li v-for="serie in series" :key="serie.id">
           {{ serie.name }} ({{ serie.original_name }})
           {{ getFlagFromCountry(serie.original_language) }}
-          {{ serie.vote_average }}
+          <font-awesome-icon
+            v-for="(star, i) in getStarsArray(serie.vote_average)"
+            :key="i"
+            :icon="star"
+          />
+          <img :src="getPosterCompletePath('w342', serie.poster_path)" alt="" />
         </li>
       </ul>
     </main>
@@ -36,10 +46,13 @@
 import axios from "axios";
 import { hasFlag } from "country-flag-icons";
 import getUnicodeFlagIcon from "country-flag-icons/unicode";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 export default {
   name: "App",
-  components: {},
+  components: {
+    FontAwesomeIcon,
+  },
   data() {
     return {
       apiUrl: "https://api.themoviedb.org/3",
@@ -48,6 +61,7 @@ export default {
       movies: [],
       seriesPath: "/search/tv",
       series: [],
+      imagePath: "https://image.tmdb.org/t/p/",
       searchInput: "ciao",
     };
   },
@@ -93,6 +107,20 @@ export default {
     getFlagFromCountry(lang) {
       let country = this.getCountryfromLanguage(lang);
       return hasFlag(country) ? getUnicodeFlagIcon(country) : "";
+    },
+    getStarsArray(vote_average) {
+      let stars = Math.ceil(vote_average / 2);
+      let iconsArray = [];
+      for (let i = 0; i < 5; i++) {
+        iconsArray.push(i < stars ? ["fas", "star"] : ["far", "star"]);
+      }
+      return iconsArray;
+    },
+    getPosterCompletePath(width, path) {
+      if (!path) {
+        return "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png";
+      }
+      return this.imagePath + width + "/" + path;
     },
   },
 };
