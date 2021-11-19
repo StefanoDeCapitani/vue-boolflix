@@ -10,32 +10,49 @@
         :originalTitle="card.original_title"
         :language="card.original_language"
         :voteAverage="card.vote_average"
+        :overview="card.overview"
+        @click.native="onCardClick(card)"
       ></Card>
     </div>
+    <CardInfo
+      v-if="selectedCard"
+      :apiKey="apiKey"
+      :searchLanguage="searchLanguage"
+      :id="selectedCard.id"
+      :title="selectedCard.title"
+      :original_title="selectedCard.original_title"
+      :original_language="selectedCard.original_language"
+      :vote_average="selectedCard.vote_average"
+      :poster_path="selectedCard.poster_path"
+      :overview="selectedCard.overview"
+    />
   </div>
 </template>
 
 <script>
 import axios from "axios";
 import Card from "./Card.vue";
+import CardInfo from "./CardInfo.vue";
 
 export default {
   name: "CardsContainer",
   components: {
     Card,
+    CardInfo,
   },
   props: {
     title: String,
     searchInput: String,
     searchCategory: String,
     searchLanguage: String,
+    apiKey: String,
   },
   data() {
     return {
       search: this.searchInput,
       apiUrl: "https://api.themoviedb.org/3",
-      apiKey: "9050243653544e50d5a8b17836489f93",
       searchPaths: { movies: "/search/movie", series: "/search/tv" },
+      selectedCard: null,
       cards: [],
     };
   },
@@ -55,6 +72,7 @@ export default {
           original_language: card.original_language,
           vote_average: card.vote_average,
           poster_path: this.getPosterCompletePath("w342", card.poster_path),
+          overview: card.overview,
         };
       });
     },
@@ -87,13 +105,16 @@ export default {
           this.cards.push(...resp.data.results);
         });
     },
+    onCardClick(card) {
+      this.selectedCard = card;
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
 .container {
-  max-width: 1280px;
+  width: min(1280px, 90%);
   padding: 3rem 0;
   .title {
     font-size: 2.5rem;
@@ -102,10 +123,12 @@ export default {
   .cardsGrid {
     $gap: 0.5rem;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: no-wrap;
+    overflow: auto;
     margin-left: -$gap;
     margin-right: -$gap;
     .card {
+      flex: 0 0 auto;
       width: calc(100% / 5 - $gap * 2);
       margin: $gap;
     }

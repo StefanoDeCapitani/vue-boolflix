@@ -1,16 +1,17 @@
 <template>
   <main class="main">
     <CardsContainer
+      :apiKey="apiKey"
       :searchInput="search"
+      :searchLanguage="searchLanguage"
       searchCategory="movies"
-      searchLanguage="it"
       title="Film"
     />
-    <hr />
     <CardsContainer
+      :apiKey="apiKey"
       :searchInput="search"
+      :searchLanguage="searchLanguage"
       searchCategory="series"
-      searchLanguage="it"
       title="Serie TV"
     />
   </main>
@@ -26,6 +27,7 @@ export default {
   },
   props: {
     searchInput: String,
+    searchLanguage: String,
   },
   watch: {
     searchInput: function () {
@@ -33,7 +35,10 @@ export default {
     },
   },
   data() {
-    return { search: this.searchInput };
+    return {
+      search: this.searchInput,
+      apiKey: "9050243653544e50d5a8b17836489f93",
+    };
   },
 };
 </script>
@@ -43,6 +48,5 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: rgb(100, 100, 100);
 }
 </style>

@@ -13,6 +13,9 @@
         <span class="key">Voto: </span
         ><FiveStarsRating :voteAverage="voteAverage" />
       </p>
+      <p v-if="overview" class="overview">
+        <span class="key">Overview: </span>{{ overview }}
+      </p>
     </div>
   </div>
 </template>
@@ -33,6 +36,7 @@ export default {
     originalTitle: String,
     language: String,
     voteAverage: Number,
+    overview: String,
   },
 };
 </script>
@@ -56,11 +60,25 @@ export default {
     flex-direction: column;
     gap: 0.8rem;
     line-height: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    overflow: hidden;
     .key {
       font-weight: bold;
     }
-    opacity: 0;
-    transition: opacity 0.5s ease;
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 1) 85%
+      );
+    }
   }
 
   &:hover {

@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <Header v-model="searchInput" />
-    <Main :searchInput="searchInput"></Main>
+    <Main :searchInput="searchInput" :searchLanguage="searchLanguage"></Main>
   </div>
 </template>
 
@@ -18,6 +18,7 @@ export default {
   data() {
     return {
       searchInput: "",
+      searchLanguage: "it",
     };
   },
 };
@@ -28,5 +29,7 @@ export default {
 
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  background-color: rgb(54, 54, 54);
 }
 </style>
