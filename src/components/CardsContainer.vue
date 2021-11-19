@@ -12,10 +12,12 @@
         :voteAverage="card.vote_average"
         :overview="card.overview"
         @click.native="onCardClick(card)"
+        @focus-card="focusOnCard = true"
+        @blur-card="focusOnCard = false"
       ></Card>
     </div>
     <CardInfo
-      v-if="selectedCard"
+      v-if="focusOnCard && selectedCard.id !== 0"
       :apiKey="apiKey"
       :searchLanguage="searchLanguage"
       :id="selectedCard.id"
@@ -49,16 +51,25 @@ export default {
   },
   data() {
     return {
+      focusOnCard: false,
       search: this.searchInput,
       apiUrl: "https://api.themoviedb.org/3",
       searchPaths: { movies: "/search/movie", series: "/search/tv" },
-      selectedCard: null,
+      selectedCard: {
+        id: 0,
+        title: "",
+        original_title: "",
+        original_language: "",
+        vote_average: 0,
+        poster_path: "",
+        overview: "",
+      },
       cards: [],
     };
   },
   watch: {
-    searchInput: function () {
-      this.search = this.searchInput;
+    searchInput: function (newInput) {
+      this.search = newInput;
       this.apiSearch();
     },
   },
@@ -89,7 +100,7 @@ export default {
       if (!path) {
         return "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png";
       }
-      return "https://image.tmdb.org/t/p/" + width + "/" + path;
+      return "https://image.tmdb.org/t/p/" + width + path;
     },
     apiSearch() {
       axios
@@ -115,10 +126,12 @@ export default {
 <style lang="scss" scoped>
 .container {
   width: min(1280px, 90%);
+  min-height: 500px;
   padding: 3rem 0;
   .title {
     font-size: 2.5rem;
     margin: 0 1rem 1rem;
+    color: white;
   }
   .cardsGrid {
     $gap: 0.5rem;

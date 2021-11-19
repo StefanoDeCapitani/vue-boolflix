@@ -1,5 +1,10 @@
 <template>
-  <div class="card">
+  <div
+    class="card"
+    tabindex="0"
+    @focus="$emit('focus-card')"
+    @blur="$emit('blur-card')"
+  >
     <img :src="posterPath" alt="" />
     <div class="card__info">
       <p><span class="key">Titolo: </span>{{ title }}</p>
@@ -84,6 +89,12 @@ export default {
   &:hover {
     .card__info {
       opacity: 1;
+    }
+  }
+
+  &:focus {
+    .card__info {
+      opacity: 0;
     }
   }
 }
