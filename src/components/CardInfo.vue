@@ -11,11 +11,11 @@
           <span class="key">Original title:</span> {{ card.originalTitle }}
         </div>
         <div>
-          <span class="key">Voto:</span>
+          <span class="key">Voto: </span>
           <FiveStarRating :voteAverage="card.voteAverage" />
         </div>
         <div>
-          <span class="key">Lingua:</span>
+          <span class="key">Lingua: </span>
           <LanguageFlag :language="card.originalLanguage" />
         </div>
         <div v-if="card.genres.length > 0">
@@ -29,7 +29,7 @@
       </div>
       <div class="card-info__overview">
         <div class="overview-text" v-if="card.overview">
-          <span class="key">Overview:</span> {{ card.overview }}
+          <div><span class="key">Overview:</span> {{ card.overview }}</div>
         </div>
       </div>
     </div>
@@ -78,7 +78,7 @@ export default {
     };
   },
   methods: {
-    apiCall() {
+    fetchData() {
       this.pendingCalls = 2;
       axios
         .get(this.apiUrl + this.card.id + "/credits", {
@@ -94,6 +94,12 @@ export default {
               this.card.actors.push(resp.data.cast[i].name);
             }
           }
+        })
+        .catch((error) => {
+          console.log(error);
+          this.card.actors = [];
+        })
+        .finally(() => {
           if (--this.pendingCalls === 0) {
             this.populateCard();
           }
@@ -110,6 +116,12 @@ export default {
           resp.data.genres.forEach((genre) => {
             this.card.genres.push(genre.name);
           });
+        })
+        .catch((error) => {
+          console.log(error);
+          this.card.genres = [];
+        })
+        .finally(() => {
           if (--this.pendingCalls === 0) {
             this.populateCard();
           }
@@ -128,11 +140,11 @@ export default {
   watch: {
     id: function (newId) {
       this.card.id = newId;
-      this.apiCall();
+      this.fetchData();
     },
   },
   mounted() {
-    this.apiCall();
+    this.fetchData();
   },
 };
 </script>
@@ -166,10 +178,13 @@ export default {
       z-index: 0;
       padding: calc($padding / 2);
       color: white;
-      display: flex;
-      align-items: flex-end;
       .overview-text {
+        position: absolute;
+        left: calc($padding / 2);
+        bottom: calc($padding + $padding / 2);
+        max-height: 40%;
         width: 65%;
+        overflow: auto;
       }
       &::after {
         content: "";
