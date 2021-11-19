@@ -48,6 +48,7 @@ export default {
     searchCategory: String,
     searchLanguage: String,
     apiKey: String,
+    selectedGenres: Array,
   },
   data() {
     return {
@@ -55,6 +56,8 @@ export default {
       search: this.searchInput,
       apiUrl: "https://api.themoviedb.org/3",
       searchPaths: { movies: "/search/movie", series: "/search/tv" },
+      placeHolderImage:
+        "https://www.altavod.com/assets/images/poster-placeholder.png",
       selectedCard: {
         id: 0,
         title: "",
@@ -65,6 +68,7 @@ export default {
         overview: "",
       },
       cards: [],
+      selectedGenresArray: [],
     };
   },
   watch: {
@@ -72,10 +76,13 @@ export default {
       this.search = newInput;
       this.apiSearch();
     },
+    selectedGenres: function (newSelectedGenres) {
+      this.selectedGenresArray = newSelectedGenres;
+    },
   },
   computed: {
     customCards: function () {
-      return this.cards.map((card) => {
+      return this.filteredCards.map((card) => {
         return {
           id: card.id,
           title: card.title || card.name,
@@ -86,6 +93,21 @@ export default {
           overview: card.overview,
         };
       });
+    },
+    filteredCards: function () {
+      if (this.selectedGenresArray.length > 0) {
+        return [...this.cards].filter((card) => {
+          let mustReturn = false;
+          this.selectedGenresArray.forEach((genre) => {
+            if (card.genre_ids.includes(genre)) {
+              mustReturn = true;
+            }
+          });
+          return mustReturn;
+        });
+      } else {
+        return this.cards;
+      }
     },
   },
   methods: {
@@ -98,7 +120,7 @@ export default {
     },
     getPosterCompletePath(width, path) {
       if (!path) {
-        return "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png";
+        return this.placeHolderImage;
       }
       return "https://image.tmdb.org/t/p/" + width + path;
     },
@@ -128,13 +150,16 @@ export default {
   width: min(1280px, 90%);
   min-height: 500px;
   padding: 3rem 0;
+  display: flex;
+  flex-direction: column;
+  $gap: 0.5rem;
+  gap: $gap;
   .title {
     font-size: 2.5rem;
     margin: 0 1rem 1rem;
     color: white;
   }
   .cardsGrid {
-    $gap: 0.5rem;
     display: flex;
     flex-wrap: no-wrap;
     overflow: auto;

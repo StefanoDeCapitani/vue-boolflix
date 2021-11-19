@@ -1,7 +1,15 @@
 <template>
   <div id="app">
-    <Header v-model="searchInput" />
-    <Main :searchInput="searchInput" :searchLanguage="searchLanguage"></Main>
+    <Header
+      v-model="searchInput"
+      @open-filter="isFilterOpened = true"
+      @close-filter="isFilterOpened = false"
+    />
+    <Main
+      :searchInput="searchInput"
+      :searchLanguage="searchLanguage"
+      :filterOpened="isFilterOpened"
+    ></Main>
   </div>
 </template>
 
@@ -19,6 +27,7 @@ export default {
     return {
       searchInput: "",
       searchLanguage: "it",
+      isFilterOpened: false,
     };
   },
 };
