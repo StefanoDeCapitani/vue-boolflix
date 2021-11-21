@@ -1,6 +1,7 @@
 <template>
   <div class="filter-container">
     <CustomCheckBox
+      tabindex="0"
       v-for="genre in genres"
       :key="genre.id"
       :genre="genre"
@@ -31,7 +32,7 @@ export default {
 <style lang="scss" scoped>
 .filter-container {
   align-self: start;
-  margin-top: 1rem;
+  margin: 1rem 0;
   padding: 1rem;
   background-color: black;
   color: white;

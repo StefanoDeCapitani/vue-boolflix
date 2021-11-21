@@ -22,6 +22,10 @@ export default {
       if (this.language === "en") return "GB";
       if (this.language === "es") return "ES";
       if (this.language === "el") return "GR";
+      if (this.language === "zh") return "CN";
+      if (this.language === "hi") return "IN";
+      if (this.language === "fa") return "AF";
+      if (this.language === "ar") return "AE";
 
       let CountryLanguage = require("country-language");
       let countryCode = CountryLanguage.getLanguage(

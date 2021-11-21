@@ -80,52 +80,43 @@ export default {
   methods: {
     fetchData() {
       this.pendingCalls = 2;
-      axios
-        .get(this.apiUrl + this.card.id + "/credits", {
-          params: {
-            api_key: this.apiKey,
-            language: this.searchLanguage,
-          },
-        })
-        .then((resp) => {
-          this.card.actors = [];
-          for (let i = 0; i < 5; i++) {
-            if (resp.data.cast[i]) {
-              this.card.actors.push(resp.data.cast[i].name);
+      for (let type of ["/credits", ""]) {
+        axios
+          .get(this.apiUrl + this.card.id + type, {
+            params: {
+              api_key: this.apiKey,
+              language: this.searchLanguage,
+            },
+          })
+          .then((resp) => {
+            type === "/credits" ? this.setActors(resp) : this.setGenres(resp);
+          })
+          .catch((error) => {
+            console.log(error);
+            type === "/credits"
+              ? (this.card.actors = [])
+              : (this.card.genres = []);
+          })
+          .finally(() => {
+            if (--this.pendingCalls === 0) {
+              this.populateCard();
             }
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          this.card.actors = [];
-        })
-        .finally(() => {
-          if (--this.pendingCalls === 0) {
-            this.populateCard();
-          }
-        });
-      axios
-        .get(this.apiUrl + this.card.id, {
-          params: {
-            api_key: this.apiKey,
-            language: this.searchLanguage,
-          },
-        })
-        .then((resp) => {
-          this.card.genres = [];
-          resp.data.genres.forEach((genre) => {
-            this.card.genres.push(genre.name);
           });
-        })
-        .catch((error) => {
-          console.log(error);
-          this.card.genres = [];
-        })
-        .finally(() => {
-          if (--this.pendingCalls === 0) {
-            this.populateCard();
-          }
-        });
+      }
+    },
+    setActors(resp) {
+      this.card.actors = [];
+      for (let i = 0; i < 5; i++) {
+        if (resp.data.cast[i]) {
+          this.card.actors.push(resp.data.cast[i].name);
+        }
+      }
+    },
+    setGenres(resp) {
+      this.card.genres = [];
+      resp.data.genres.forEach((genre) => {
+        this.card.genres.push(genre.name);
+      });
     },
     populateCard() {
       this.card.title = this.title;
@@ -152,9 +143,7 @@ export default {
 <style lang="scss" scoped>
 .container--card-info {
   background-color: black;
-  min-height: 300px;
-  height: 350px;
-  max-height: 400px;
+  height: 400px;
   width: 100%;
   .card-info {
     $padding: 1rem;

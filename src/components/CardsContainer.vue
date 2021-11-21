@@ -55,7 +55,9 @@ export default {
       focusOnCard: false,
       search: this.searchInput,
       apiUrl: "https://api.themoviedb.org/3",
-      searchPaths: { movies: "/search/movie", series: "/search/tv" },
+      searchPaths: { movies: "/movie", series: "/tv" },
+      searchModes: { search: "/search", discover: "/discover" },
+      language: "",
       placeHolderImage:
         "https://www.altavod.com/assets/images/poster-placeholder.png",
       selectedCard: {
@@ -79,6 +81,10 @@ export default {
     selectedGenres: function (newSelectedGenres) {
       this.selectedGenresArray = newSelectedGenres;
     },
+    searchLanguage: function (newLanguage) {
+      this.language = newLanguage;
+      this.apiSearch("discover");
+    },
   },
   computed: {
     customCards: function () {
@@ -96,21 +102,22 @@ export default {
     },
     filteredCards: function () {
       if (this.selectedGenresArray.length > 0) {
-        return [...this.cards].filter((card) => {
-          let mustReturn = false;
-          this.selectedGenresArray.forEach((genre) => {
-            if (card.genre_ids.includes(genre)) {
-              mustReturn = true;
-            }
-          });
-          return mustReturn;
-        });
+        return [...this.cards].filter(this.filterByGenre);
       } else {
         return this.cards;
       }
     },
   },
   methods: {
+    filterByGenre(card) {
+      let mustReturn = false;
+      this.selectedGenresArray.forEach((genre) => {
+        if (card.genre_ids.includes(genre)) {
+          mustReturn = true;
+        }
+      });
+      return mustReturn;
+    },
     getOriginalTitleIfDifferentFromTitle(card) {
       let title = card.title || card.name;
       let originalTitle = card.original_title || card.original_name;
@@ -124,15 +131,21 @@ export default {
       }
       return "https://image.tmdb.org/t/p/" + width + path;
     },
-    apiSearch() {
+
+    apiSearch(_mode = "search") {
       axios
-        .get(this.apiUrl + this.searchPaths[this.searchCategory], {
-          params: {
-            api_key: this.apiKey,
-            language: this.searchLanguage,
-            query: this.search,
-          },
-        })
+        .get(
+          this.apiUrl +
+            this.searchModes[_mode] +
+            this.searchPaths[this.searchCategory],
+          {
+            params: {
+              api_key: this.apiKey,
+              language: this.language,
+              ...(_mode === "search" ? { query: this.search } : {}),
+            },
+          }
+        )
         .then((resp) => {
           this.cards = [];
           this.cards.push(...resp.data.results);

@@ -1,5 +1,10 @@
 <template>
-  <div class="customCheckBox" :class="{ active: isChecked }" @click="onClick">
+  <div
+    class="customCheckBox"
+    :class="{ active: isChecked }"
+    @click="onClick"
+    @keyup.enter="onClick"
+  >
     <FontAwesomeIcon :icon="['far', 'square']" v-if="!isChecked" />
     <FontAwesomeIcon :icon="['far', 'check-square']" v-if="isChecked" />
     <div class="label">{{ genre.name }}</div>

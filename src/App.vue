@@ -1,7 +1,8 @@
 <template>
   <div id="app">
     <Header
-      v-model="searchInput"
+      v-model="searchLanguage"
+      @input="onInput"
       @open-filter="isFilterOpened = true"
       @close-filter="isFilterOpened = false"
     />
@@ -26,9 +27,17 @@ export default {
   data() {
     return {
       searchInput: "",
-      searchLanguage: "it",
+      searchLanguage: "",
       isFilterOpened: false,
     };
+  },
+  mounted() {
+    this.searchLanguage = navigator.language.split("-")[0];
+  },
+  methods: {
+    onInput(value) {
+      this.searchInput = value;
+    },
   },
 };
 </script>

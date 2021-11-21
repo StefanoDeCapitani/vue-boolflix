@@ -58,7 +58,7 @@ export default {
   .card__info {
     position: absolute;
     inset: 0;
-    padding: 1.5rem 2rem;
+    padding: 1rem 1.5rem;
     background-color: black;
     color: rgba(255, 255, 255, 0.8);
     display: flex;

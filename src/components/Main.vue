@@ -1,5 +1,11 @@
 <template>
   <main class="main" :class="{ 'show-filter': isFilterOpened }">
+    <CardsFilter
+      class="filter"
+      v-if="isFilterOpened"
+      :genres="genres"
+      @click-genre="onClickGenre"
+    />
     <div class="sections">
       <CardsContainer
         :apiKey="apiKey"
@@ -18,11 +24,6 @@
         title="Serie TV"
       />
     </div>
-    <CardsFilter
-      v-if="isFilterOpened"
-      :genres="genres"
-      @click-genre="onClickGenre"
-    />
   </main>
 </template>
 
@@ -63,26 +64,57 @@ export default {
     };
   },
   mounted() {
-    axios
-      .get("https://api.themoviedb.org/3/genre/movie/list", {
-        params: {
-          api_key: this.apiKey,
-          language: this.searchLanguage,
-        },
-      })
-      .then((resp) => {
-        this.genres.push(...resp.data.genres);
-      });
+    this.getGenresFromApi();
   },
   methods: {
+    getGenresFromApi() {
+      let pendingCalls = 2;
+      for (let type of ["tv", "movie"]) {
+        axios
+          .get(`https://api.themoviedb.org/3/genre/${type}/list`, {
+            params: {
+              api_key: this.apiKey,
+              language: this.searchLanguage,
+            },
+          })
+          .then((resp) => {
+            let newGenres = [...resp.data.genres];
+            this.addToGenres(newGenres);
+          })
+          .finally(() => {
+            if (--pendingCalls === 0) {
+              this.genres.sort((a, b) => a.name.localeCompare(b.name));
+            }
+          });
+      }
+    },
+    addToGenres(newGenres) {
+      this.genres =
+        this.genres.length === 0
+          ? this.genres.concat(newGenres)
+          : this.getNonDuplicateGenres(this.genres.concat(newGenres));
+    },
+    getNonDuplicateGenres(genres) {
+      return genres.reduce((acc, el) => {
+        return acc.map((gen) => gen.id).includes(el.id) ? acc : acc.concat(el);
+      }, []);
+    },
+
     onClickGenre(genre) {
       if (genre.isChecked) {
-        this.selectedGenres.push(genre.id);
+        this.addSelectedGenre(genre.id);
       } else {
         if (this.selectedGenres.length > 0) {
-          this.selectedGenres.splice(this.selectedGenres.indexOf(genre.id), 1);
+          this.removeSelectedGenre(genre.id);
         }
       }
+    },
+    addSelectedGenre(genreId) {
+      this.selectedGenres.push(genreId);
+    },
+    removeSelectedGenre(genreId) {
+      let genreToBeRemovedIndex = this.selectedGenres.indexOf(genreId);
+      this.selectedGenres.splice(genreToBeRemovedIndex, 1);
     },
   },
 };
@@ -93,11 +125,17 @@ export default {
   &.show-filter {
     display: grid;
     grid-template-columns: 8fr 2fr;
+    grid-template-areas: "cards genre-filter";
   }
   .sections {
     display: flex;
     flex-direction: column;
     align-items: center;
+    grid-area: cards;
+    padding-bottom: 2rem;
+  }
+  .filter {
+    grid-area: genre-filter;
   }
 }
 </style>
